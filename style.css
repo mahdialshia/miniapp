@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: var(--tg-theme-bg-color, #f4f4f4); /* استخدام سمة تليجرام للون الخلفية */
-    color: var(--tg-theme-text-color, #333); /* استخدام سمة تليجرام للون النص */
+    background-color: var(--tg-theme-bg-color, #f4f4f4);
+    color: var(--tg-theme-text-color, #333);
     padding: 20px;
     margin: 0;
 }
