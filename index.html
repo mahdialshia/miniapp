@@ -26,51 +26,54 @@
     </div>
 
     <script>
-        // دالة يتم تنفيذها عند تحميل الصفحة
+        let currentPhotoId = null;
+        let currentAction = null;
+
         function initWebApp() {
-            // جعل التطبيق جاهزًا
             Telegram.WebApp.ready();
             
-            // قراءة البيانات المرسلة من البوت في الـ URL
             const urlParams = new URLSearchParams(window.location.search);
-            const photoId = urlParams.get('id');
-            const action = urlParams.get('action');
+            currentPhotoId = urlParams.get('id');
+            currentAction = urlParams.get('action');
 
-            if (photoId && action) {
-                // عرض معلومات العملية الحالية
+            if (currentPhotoId && currentAction) {
                 document.getElementById('info-message').innerHTML = 
-                    `You selected **${action}** for image ID: <span class="id-text">${photoId.substring(0, 10)}...</span>`;
+                    `You selected **${currentAction}** for image ID: <span class="id-text">${currentPhotoId.substring(0, 10)}...</span>`;
             } else {
                 document.getElementById('info-message').textContent = "Error: Missing image ID or action.";
             }
 
-            // ربط الزر بدالة الإرسال
-            document.getElementById('process-button').onclick = () => sendProcessRequest(photoId, action);
+            // 1. ربط الزر العادي في منتصف الشاشة 
+            document.getElementById('process-button').onclick = () => {
+                // رسالة تنبيه بسيطة للـ Debugging: للتأكد من أن الزر يعمل
+                alert("Processing button clicked! Attempting to send data...");
+                sendProcessRequest();
+            };
             
-            // إظهار الزر الرئيسي في شريط تليجرام (اختياري)
+            // 2. ربط الزر السفلي الرئيسي (الأكثر موثوقية)
             Telegram.WebApp.MainButton.setText("Confirm & Process").show();
-            Telegram.WebApp.MainButton.onClick(() => sendProcessRequest(photoId, action));
+            Telegram.WebApp.MainButton.onClick(sendProcessRequest);
         }
 
-        // دالة إرسال البيانات إلى البوت وإغلاق النافذة
-        function sendProcessRequest(photoId, action) {
-            if (!photoId || !action) {
-                alert("Cannot process without image data.");
+        // دالة الإرسال الرئيسية
+        function sendProcessRequest() {
+            if (!currentPhotoId || !currentAction) {
+                alert("Cannot process without image data. Closing app.");
+                Telegram.WebApp.close(); 
                 return;
             }
 
             const setting = document.getElementById('quality-setting').value;
             
             const dataToSend = {
-                id: photoId,
-                action: action,
+                id: currentPhotoId,
+                action: currentAction,
                 setting: setting
             };
 
-            // إرسال البيانات كـ JSON String إلى البوت
             const jsonString = JSON.stringify(dataToSend);
             
-            // هذه الوظيفة ترسل البيانات وتغلق نافذة التطبيق المصغر
+            // 🚨 هنا يتم إرسال البيانات إلى البوت وإغلاق النافذة
             Telegram.WebApp.sendData(jsonString); 
         }
 
